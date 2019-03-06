@@ -179,7 +179,12 @@ fzf -params 2..4 %{ evaluate-commands %sh{
         [ -n "${tmux_height%%*%}" ] && measure="-p" || measure="-p"
         cmd="command tmux split-window $measure ${tmux_height%%%*} 'sh -c $fzfcmd'"
     elif [ -n "$kak_opt_termcmd" ]; then
-        cmd="$kak_opt_termcmd 'sh -c $fzfcmd'"
+        # cmd="$kak_opt_termcmd 'sh -c $fzfcmd'"
+        # cmd=$(eval echo $cmd)
+        # arg="KITTY_WINDOW_ID=\$kak_client_env_KITTY_WINDOW_ID"
+        #arg="KITTY_WINDOW_ID=$kak_opt_termcmd"
+        cmd="KITTY_WINDOW_ID=$kak_client_env_KITTY_WINDOW_ID nkw 'sh -c $fzfcmd'"
+        #printf "%s\n" "fail %{$cmd}"
     else
         printf "%s\n" "fail %{termcmd option is not set}"
         rm $fzfcmd
@@ -187,7 +192,10 @@ fzf -params 2..4 %{ evaluate-commands %sh{
         exit
     fi
 
+    #res=$(eval echo '$cmd')
+    #printf "%s\n" "fail %{msg: $res}"
     (
+        # printf "%s\n" "fail %{$cmd}"
         eval "$cmd"
         while [ -e $fzfcmd ]; do
             sleep 0.1
